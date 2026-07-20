@@ -1,0 +1,858 @@
+{
+  "settings": [
+    {
+      "key": "currency",
+      "value": "PHP"
+    },
+    {
+      "key": "reinvestment_goal_min",
+      "value": "15000"
+    },
+    {
+      "key": "reinvestment_goal_max",
+      "value": "20000"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Main Decants"
+    },
+    {
+      "name": "Oil Concentration"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "Size",
+      "unit": "ML",
+      "values": [
+        {
+          "value": "50 ML",
+          "sortOrder": 0
+        },
+        {
+          "value": "30 ML",
+          "sortOrder": 1
+        },
+        {
+          "value": "100 ML (type A)",
+          "sortOrder": 2
+        },
+        {
+          "value": "100 ML (type B)",
+          "sortOrder": 3
+        },
+        {
+          "value": "Scraps",
+          "sortOrder": 4
+        },
+        {
+          "value": "10 ML",
+          "sortOrder": 5
+        },
+        {
+          "value": "10 ML (LP)",
+          "sortOrder": 6
+        }
+      ]
+    },
+    {
+      "name": "Concentration",
+      "unit": "%",
+      "values": [
+        {
+          "value": "20",
+          "sortOrder": 0
+        },
+        {
+          "value": "25",
+          "sortOrder": 1
+        },
+        {
+          "value": "30",
+          "sortOrder": 2
+        },
+        {
+          "value": "35",
+          "sortOrder": 3
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "name": "ECLAT for men",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 4,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 500
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 2,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "ECLAT for women",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 5,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 500
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "CK one",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 4,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 450
+        },
+        {
+          "size": "10 ML (LP)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 80
+        }
+      ]
+    },
+    {
+      "name": "Bulgari",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 5,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 450
+        },
+        {
+          "size": "10 ML (LP)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 80
+        }
+      ]
+    },
+    {
+      "name": "Aventus",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 450
+        },
+        {
+          "size": "10 ML (LP)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 80
+        }
+      ]
+    },
+    {
+      "name": "Imagination",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 3,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 450
+        },
+        {
+          "size": "Scraps",
+          "concentration": null,
+          "stockQty": 2,
+          "price": 200
+        },
+        {
+          "size": "10 ML (LP)",
+          "concentration": null,
+          "stockQty": 2,
+          "price": 80
+        }
+      ]
+    },
+    {
+      "name": "Imag + Aventus",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 450
+        }
+      ]
+    },
+    {
+      "name": "Valaya",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 9,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 2,
+          "price": 500
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "Paradoxe",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 5,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 500
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 5,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "Good Girl",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 2,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 450
+        },
+        {
+          "size": "10 ML (LP)",
+          "concentration": null,
+          "stockQty": 4,
+          "price": 80
+        }
+      ]
+    },
+    {
+      "name": "Jo Malone",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 5,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 450
+        },
+        {
+          "size": "10 ML (LP)",
+          "concentration": null,
+          "stockQty": 2,
+          "price": 80
+        }
+      ]
+    },
+    {
+      "name": "D and G",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 450
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 2,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "Dior",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 5,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 500
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "Green apple",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 4,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 450
+        }
+      ]
+    },
+    {
+      "name": "Another 13",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 4,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 450
+        }
+      ]
+    },
+    {
+      "name": "Santal 33 (25%)",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 3,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 450
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "Delina",
+      "category": "Main Decants",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": null,
+          "stockQty": 5,
+          "price": 300
+        },
+        {
+          "size": "30 ML",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 200
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 500
+        },
+        {
+          "size": "100 ML (type B)",
+          "concentration": null,
+          "stockQty": 1,
+          "price": 450
+        },
+        {
+          "size": "10 ML",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 100
+        }
+      ]
+    },
+    {
+      "name": "Blooming boquet",
+      "category": "Oil Concentration",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": 20,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 25,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 30,
+          "stockQty": 2,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 35,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 20,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 25,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 30,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 35,
+          "stockQty": 0,
+          "price": null
+        }
+      ]
+    },
+    {
+      "name": "hawas ICE",
+      "category": "Oil Concentration",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": 20,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 25,
+          "stockQty": 5,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 30,
+          "stockQty": 2,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 35,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 20,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 25,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 30,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 35,
+          "stockQty": 0,
+          "price": null
+        }
+      ]
+    },
+    {
+      "name": "Black Opium",
+      "category": "Oil Concentration",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": 20,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 25,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 30,
+          "stockQty": 2,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 35,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 20,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 25,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 30,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 35,
+          "stockQty": 0,
+          "price": null
+        }
+      ]
+    },
+    {
+      "name": "SWYI",
+      "category": "Oil Concentration",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": 20,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 25,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 30,
+          "stockQty": 2,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 35,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 20,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 25,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 30,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 35,
+          "stockQty": 0,
+          "price": null
+        }
+      ]
+    },
+    {
+      "name": "BDC",
+      "category": "Oil Concentration",
+      "variants": [
+        {
+          "size": "50 ML",
+          "concentration": 20,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 25,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 30,
+          "stockQty": 2,
+          "price": null
+        },
+        {
+          "size": "50 ML",
+          "concentration": 35,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 20,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 25,
+          "stockQty": 0,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 30,
+          "stockQty": 1,
+          "price": null
+        },
+        {
+          "size": "10 ML",
+          "concentration": 35,
+          "stockQty": 0,
+          "price": null
+        }
+      ]
+    }
+  ]
+}
