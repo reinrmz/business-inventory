@@ -1,26 +1,59 @@
 import { prisma } from "@/lib/prisma";
+import { requireBusinessContext } from "@/lib/auth";
+import { currencySymbolFor } from "@/lib/currency";
+import {
+  getSalesTrend,
+  getTopProducts,
+  getCategoryBreakdown,
+  getLowStockVariants,
+  getAverageOrderValue,
+} from "@/lib/dashboard-data";
+import { SalesTrendChart } from "@/components/sales-trend-chart";
+import { TopProductsChart } from "@/components/top-products-chart";
+import { CategoryBreakdownChart } from "@/components/category-breakdown-chart";
+import { LowStockPanel } from "@/components/low-stock-panel";
 
 export const dynamic = "force-dynamic";
 
-function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function StatCard({
+  label,
+  value,
+  sub,
+  gold,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  gold?: boolean;
+}) {
   return (
-    <div className="rounded border bg-white p-4">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">{value}</p>
-      {sub && <p className="mt-1 text-xs text-gray-400">{sub}</p>}
+    <div className={`label-card p-5 ${gold ? "label-card--gold" : ""}`}>
+      <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">{label}</p>
+      <p className="tnum mt-2 font-display text-3xl font-bold">{value}</p>
+      {sub && <p className="mt-1 text-xs text-ink-muted">{sub}</p>}
     </div>
   );
 }
 
 export default async function DashboardPage() {
-  const [saleItems, variants, settings] = await Promise.all([
-    prisma.saleItem.findMany(),
-    prisma.variant.findMany({ where: { active: true } }),
-    prisma.setting.findMany(),
-  ]);
+  const { businessId } = await requireBusinessContext();
+
+  const [saleItems, variants, settings, dailyTrend, weeklyTrend, topProducts, categoryBreakdown, lowStock, avgOrderValue] =
+    await Promise.all([
+      prisma.saleItem.findMany({ where: { businessId } }),
+      prisma.variant.findMany({ where: { businessId, active: true } }),
+      prisma.setting.findMany({ where: { businessId } }),
+      getSalesTrend(businessId, "daily"),
+      getSalesTrend(businessId, "weekly"),
+      getTopProducts(businessId),
+      getCategoryBreakdown(businessId),
+      getLowStockVariants(businessId),
+      getAverageOrderValue(businessId),
+    ]);
 
   const settingMap = new Map(settings.map((s) => [s.key, s.value]));
   const currency = settingMap.get("currency") ?? "PHP";
+  const cur = currencySymbolFor(currency);
   const goalMin = Number(settingMap.get("reinvestment_goal_min") ?? 0);
   const goalMax = Number(settingMap.get("reinvestment_goal_max") ?? 0);
 
@@ -34,37 +67,55 @@ export default async function DashboardPage() {
   const goalProgress = goalMax > 0 ? Math.min(100, Math.round((profit / goalMax) * 100)) : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-gray-500">Overview of sales, profit, and stock.</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-accent">Overview</p>
+        <h1 className="font-display text-2xl font-bold">Dashboard</h1>
+        <p className="mt-1 text-sm text-ink-muted">
+          Sales, profit, and stock at a glance.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Revenue" value={`₱${revenue.toLocaleString()}`} sub={currency} />
-        <StatCard label="Profit" value={`₱${profit.toLocaleString()}`} />
-        <StatCard label="Stock value" value={`₱${stockValue.toLocaleString()}`} />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Revenue" value={`${cur}${revenue.toLocaleString()}`} sub={currency} />
+        <StatCard label="Profit" value={`${cur}${profit.toLocaleString()}`} gold />
+        <StatCard label="Stock value" value={`${cur}${stockValue.toLocaleString()}`} />
+        <StatCard label="Avg order value" value={`${cur}${avgOrderValue.toLocaleString()}`} />
       </div>
 
       {goalMax > 0 && (
-        <section className="rounded border bg-white p-4">
+        <section className="label-card label-card--gold p-6">
           <div className="flex items-baseline justify-between">
-            <h2 className="font-medium">Reinvestment goal</h2>
-            <span className="text-sm text-gray-500">
-              ₱{goalMin.toLocaleString()}–₱{goalMax.toLocaleString()}
+            <h2 className="font-display text-lg font-bold">Reinvestment goal</h2>
+            <span className="tnum text-sm text-ink-muted">
+              {cur}{goalMin.toLocaleString()}–{cur}{goalMax.toLocaleString()}
             </span>
           </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded bg-gray-100">
+          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gold-soft">
             <div
-              className="h-full bg-gray-900"
+              className="transition-standard h-full rounded-full bg-gold"
               style={{ width: `${goalProgress}%` }}
             />
           </div>
-          <p className="mt-1 text-xs text-gray-500">
-            ₱{profit.toLocaleString()} profit so far ({goalProgress}% of ₱{goalMax.toLocaleString()})
+          <p className="tnum mt-2 text-xs text-ink-muted">
+            {cur}{profit.toLocaleString()} profit so far — {goalProgress}% of {cur}
+            {goalMax.toLocaleString()} goal
           </p>
         </section>
       )}
+
+      <SalesTrendChart
+        daily={dailyTrend.map((p) => ({ label: p.label, revenue: p.revenue }))}
+        weekly={weeklyTrend.map((p) => ({ label: p.label, revenue: p.revenue }))}
+        currencySymbol={cur}
+      />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <TopProductsChart products={topProducts} currencySymbol={cur} />
+        <CategoryBreakdownChart categories={categoryBreakdown} currencySymbol={cur} />
+      </div>
+
+      <LowStockPanel variants={lowStock} />
     </div>
   );
 }

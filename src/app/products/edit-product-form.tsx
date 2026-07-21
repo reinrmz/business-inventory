@@ -19,7 +19,7 @@ export function EditProductForm({
     return (
       <button
         onClick={() => setEditing(true)}
-        className="text-left hover:underline"
+        className="text-left font-medium transition-standard hover:text-accent"
         title="Click to edit"
       >
         {product.name}
@@ -40,13 +40,13 @@ export function EditProductForm({
         name="name"
         defaultValue={product.name}
         required
-        className="rounded border px-2 py-1 text-sm"
+        className="rounded border border-border bg-bg px-2 py-1 text-sm outline-none focus:border-accent"
       />
       <select
         name="categoryId"
         defaultValue={product.categoryId}
         required
-        className="rounded border px-2 py-1 text-sm"
+        className="rounded border border-border bg-bg px-2 py-1 text-sm outline-none focus:border-accent"
       >
         {categories.map((c) => (
           <option key={c.id} value={c.id}>
@@ -54,13 +54,13 @@ export function EditProductForm({
           </option>
         ))}
       </select>
-      <button type="submit" className="rounded bg-gray-900 px-2 py-1 text-xs text-white">
+      <button type="submit" className="rounded bg-accent px-2 py-1 text-xs font-medium text-accent-ink">
         Save
       </button>
       <button
         type="button"
         onClick={() => setEditing(false)}
-        className="text-xs text-gray-500"
+        className="text-xs text-ink-muted"
       >
         Cancel
       </button>

@@ -5,8 +5,9 @@ deployment is a perfume decanting/reselling business (migrating off
 `SALES AND INVENTORY.xlsx`), but the data model is domain-agnostic — perfume is
 just one dataset in a model that fits any small retail/inventory business.
 
-Status: **core screens built and working locally** (Products, Inventory, Sales,
-Dashboard). Not yet done: auth, Turso/Vercel deploy.
+Status: **core screens + multi-tenant auth built and working locally**
+(Products, Inventory, Sales, Dashboard, login/signup, admin approval, demo
+account). Not yet done: Turso/Vercel deploy.
 
 ---
 
@@ -174,7 +175,17 @@ The perfume business maps onto the generic model as **data**:
   The two "100 ML" columns = **different bottle types** → two size values.
 - **Main line**: 17 products × Size variants.
 - **Oil line**: 5 products (Blooming Bouquet, Hawas Ice, Black Opium, SWYI, BDC),
-  variants along Size + Concentration (20/25/30/35 %).
+  variants along Size + Concentration (20/25/30/35 %). **Own pricing scheme**,
+  separate from the main-line size prices above (confirmed from `in PESO`
+  formulas in both sheets, e.g. `INVENTORY!B29 =B28*220`):
+
+  | Size | 20% | 25% | 30% | 35% |
+  |------|-----|-----|-----|-----|
+  | 50 ML | ₱220 | ₱270 | ₱300 | ₱350 |
+  | 10 ML | *(blank — no price set)* | ₱100 | ₱135 | ₱175 |
+
+  10 ML / 20% has no formula anywhere in the workbook — price is unset;
+  client sets it manually in the Inventory screen after import.
 - `in Pcs` / `in PESO` rows = derived rollups (not stored). `GOAL` → `setting`.
   `COSTS` row empty → cost now tracked per variant.
 
@@ -184,16 +195,21 @@ The perfume business maps onto the generic model as **data**:
 2. Main table rows 2–18 → products (Main); non-empty cells → variants with
    `stock_qty` from INVENTORY, `price` = size default, `variant_attribute`=size.
 3. Oil sub-tables → products (Oil); cells → variants with Size + Concentration.
-4. **Skip** SALES-sheet totals — no historical sales seeded; sales log starts
-   clean at go-live (decided).
+4. SALES-sheet totals → one **opening balance** `sale` (dated at import time),
+   one `sale_item` per non-empty cell (`qty` from SALES sheet, `unit_price` =
+   size default, `unit_cost` = null — no historical cost data exists).
 5. Skip `in Pcs`/`in PESO`/`GOAL`/`COSTS` rows. Trim/normalize product names.
 
 Verify:
 - 17 main + 5 oil products; variant count = non-empty Excel cells.
 - `stock_qty` per size totals match Excel `in Pcs` row.
-- Σ `stock_qty × default_price` per size matches `in PESO` (50 ML: 64 → ₱19,200).
+- Σ `stock_qty × price` per size matches `in PESO` (50 ML: 64 → ₱19,200;
+  grand total across both sheets → ₱38,865 stock value, ₱3,570 opening sale).
 - Test sale decrements the right variant + writes snapshot `sale_item`;
   editing a variant price writes a `price_history` row and does not change the sale.
+- Re-verified after adding opening-sale migration: extractor totals now match
+  Excel exactly (revenue ₱3,570, stock value ₱38,865) — confirmed the oil-line
+  pricing table above, not the main-line size price, applies to those variants.
 
 ---
 
@@ -201,12 +217,22 @@ Verify:
 
 - **Negative stock**: **block** the sale when qty > on-hand. Must restock first.
   Enforced atomically in the sale transaction (reject if any line oversells).
-- **Historical sales**: **not seeded**. Import stock only; sales log starts clean.
-- **Auth**: **single shared login** (one owner account) for v1. Multi-user/roles
-  deferred. `changed_by` fields stay nullable until then.
-- **Currency**: PHP (₱), from `setting`.
-- **Table count**: **fully generic, 11 tables** (confirmed over a simpler
-  flat-column alternative) — see §4.
+- **Historical sales**: **seeded as one lump "opening balance" sale** (revised
+  from the original "skip" decision — client wants existing SALES totals
+  reflected, not a ₱0 start). One `Sale` record per import run, dated at
+  import time, one `SaleItem` per non-empty SALES-sheet cell (qty × default
+  price). `unitCost` is `null` on these lines — Excel never tracked cost
+  (`COSTS` row empty), so profit only accrues from cost-tracked sales going
+  forward. Re-running the seed on updated Excel data replaces this opening
+  sale (see migration script, §5).
+- **Auth**: superseded — see §9. App is now **multi-tenant**: many businesses,
+  a user can belong to several, one login per business (no in-business roles
+  yet), both new users and new businesses need admin approval, plus a
+  read/write demo account. `changed_by` fields stay nullable (no in-business
+  roles = nothing meaningful to attribute yet).
+- **Currency**: PHP (₱) for Fragrenz, USD for the demo business — both from
+  `setting`, now scoped per business (see §9 schema changes).
+- **Table count**: 11 domain tables (§4) + 4 auth tables (§9) = 15.
 
 ### Still open (not blocking build)
 - Multi-user + roles (later, if staff added).
@@ -258,11 +284,12 @@ one repo, free hosting + free DB, no server to manage.
    oversell) → Dashboard (revenue/profit/stock value/goal).~~ done — all 4
    pages built and smoke-tested locally (200 OK, correct data, oversell
    blocked, price edits don't rewrite past sales — verified end-to-end).
-   Currently bare-bones Tailwind (tables + plain forms), no design pass yet.
-5. **UI design pass** — client requested this before Turso/deploy. Take the 4
-   functional screens and give them real visual design (layout, hierarchy,
-   color, empty/loading states) rather than default utility styling. **← next**
-6. Single-login auth; connect Turso; deploy to Vercel.
+5. ~~UI design pass~~ done — "Vessel" visual identity (violet accent, gold for
+   money, Space Grotesk display + Geist body, label-card motif, light/dark
+   theme toggle). See §9 for what's still cosmetic-only (currency symbol is
+   hardcoded ₱ regardless of business `setting`).
+6. ~~Multi-tenant auth (users, businesses, admin approval, demo account)~~
+   done — see §9. **← next: connect Turso; deploy to Vercel.**
 
 ---
 
@@ -281,3 +308,151 @@ Next.js. Quick orientation, kept here so it isn't re-explained every session:
 - **Server actions** replace what would be a separate REST API — a function
   marked `"use server"` runs on the server but is called directly from a React
   component, no manual fetch/endpoint wiring needed for simple CRUD.
+
+---
+
+## 9. Multi-Tenant Auth (built)
+
+Client decided (mid-build) to support **multiple businesses**, not just
+Fragrenz — real login, data isolation per business, and controlled
+onboarding (not open self-service) since the client wants personal oversight
+of who gets in.
+
+### Decisions
+- **Multi-tenant**: `Business` is the data boundary. One `User` can belong to
+  many businesses (`Membership` join table) — e.g. one owner running two
+  shops, switchable via a dropdown in the header.
+- **One login per business** — no owner/staff roles within a business yet.
+- **Both new users AND new businesses need admin approval** before they're
+  usable. Reviewed via a simple `/admin` page (pending lists, Approve/Reject).
+  Exactly one admin — a plain `isAdmin` boolean on `User`, not a role system.
+- **Standard email + password** login, not Google/OAuth — simplest to build,
+  no external account dependency, composes cleanly with approval gating.
+- **Demo account**: a "Try the demo" button on `/login`, backed by a real,
+  read/write `Business` ("Demo Boutique") with mock candle-shop data.
+  Resets nightly via Vercel Cron so it doesn't degrade.
+
+### Auth mechanism
+Hand-rolled **database-backed sessions** (not NextAuth, not JWT) — the
+"Database Sessions" pattern from Next.js's own docs. An httpOnly cookie
+holds an opaque random token; a `Session` row (storing only a SHA-256 hash
+of the token) maps it to a `User`. Passwords hashed with `bcryptjs`.
+Rejected NextAuth (unneeded OAuth/adapter complexity, a second framework to
+learn) and stateless JWT (can't cleanly support revocation/re-validation
+when a business's approval status or membership changes mid-session).
+
+`src/proxy.ts` (Next.js 16 renamed `middleware.ts` → `proxy.ts`) does only an
+**optimistic cookie-presence check** — redirects to `/login` if the
+`session` cookie is simply absent, no DB call. All real validation lives in
+`src/lib/auth.ts`:
+- `getCurrentUser()` — resolves session → user, checks `user.status`
+  (`PENDING`/`REJECTED` block usage even though login itself succeeded).
+- `getCurrentBusinessId(userId)` — reads the `activeBusinessId` cookie,
+  re-validates a `Membership` exists **and** the business is `APPROVED` on
+  every call (a user could edit the cookie to point at a business they
+  don't belong to — never trusted blindly).
+- `requireBusinessContext()` — convenience wrapper combining both, used at
+  the top of every page/action; redirects to `/login`,
+  `/pending-approval?reason=...`, or `/businesses/new` as appropriate.
+
+### Schema additions (`prisma/schema.prisma`)
+Four new models: `User`, `Business`, `Membership`, `Session`, plus
+`UserStatus`/`BusinessStatus` enums (`PENDING | APPROVED | REJECTED`).
+`businessId` (required `Int` FK) added directly to **all 11 existing domain
+models** — not just "root" ones — so every scoped query is the same simple
+`where: { businessId, ... }` shape, no nested relation-chain filters to get
+right or forget. `Setting`'s primary key changed from `key @id` to
+`id @id @default(autoincrement())` + `@@unique([businessId, key])`, since the
+same key (e.g. `"currency"`) now exists once per business.
+
+Scoping was done via **explicit `requireBusinessContext()` calls**, not a
+Prisma Client Extension — an extension would need `AsyncLocalStorage`-based
+request context to scope correctly against the shared `PrismaClient`
+singleton, real complexity with a scary failure mode (cross-tenant leaks) if
+ever wrong. An explicit helper call is greppable and matches the rest of the
+codebase's style.
+
+### Key files
+- `src/lib/auth.ts` — session creation/validation, password hashing, the
+  approval-aware `getCurrentUser`/`getCurrentBusinessId`/`requireBusinessContext`.
+- `src/app/(auth)/actions.ts` — `signup`, `login`, `logout`, `loginAsDemo`,
+  `createBusiness`, `switchBusiness`.
+- `src/app/login/`, `src/app/signup/`, `src/app/pending-approval/`,
+  `src/app/businesses/new/` — auth-facing pages.
+- `src/app/admin/page.tsx` + `actions.ts` — pending-approval review UI.
+- `src/app/header.tsx` — nav + business switcher + logout, replaces the old
+  inline header in `layout.tsx`.
+- `prisma/seed.ts` — now creates/reuses the Fragrenz business + a placeholder
+  admin login (`admin@fragrenz.local` / `changeme123` — **change after first
+  login**) before importing Excel data, all scoped to that business.
+- `prisma/seed-demo.ts` — shared seed/reset function for the demo business
+  (`demo@vessel.app` / `demodemo`); also the manual reset entry point
+  (`npx tsx prisma/seed-demo.ts`).
+- `src/app/api/cron/reset-demo/route.ts` + `vercel.json` — nightly demo reset
+  via Vercel Cron, guarded by a `CRON_SECRET` env var.
+
+### Dynamic currency (built)
+`src/lib/currency.ts` maps a business's `Setting.currency` code (PHP/USD/
+EUR/GBP) to a display symbol. `getCurrencySymbol(businessId)` for pages that
+don't already have the settings loaded; `currencySymbolFor(code)` for pages
+(like the dashboard) that already fetched `Setting` rows and just need the
+mapping. All 4 pages (Dashboard, Inventory, Sales + its form) now render the
+business's actual currency — verified Fragrenz shows ₱, demo shows $, no
+cross-contamination.
+
+A "+ New business…" option was added to the header's business-switcher
+dropdown (`src/app/business-switcher-select.tsx`), navigating to
+`/businesses/new` — previously that page existed but had no UI entry point.
+
+### Known gaps (not blocking)
+- No password-reset flow — v1 accepts "admin resets manually via Prisma
+  Studio" for the rare case, given the small scale.
+- Rejection (user or business) is terminal — no re-apply flow.
+
+---
+
+## 10. Dashboard Analytics (built)
+
+Added beyond the original revenue/profit/stock-value/goal tiles, using the
+`dataviz` skill's method (form chosen by the data's job, color validated
+computationally, not eyeballed):
+
+- **Sales trend** — line chart, daily (30d) / weekly (12wk) toggle, hover
+  crosshair + tooltip. `src/components/sales-trend-chart.tsx`.
+- **Top products** — horizontal bar, top 5 by revenue, qty sold direct-labeled.
+  `src/components/top-products-chart.tsx`.
+- **Revenue by category** — horizontal **stacked bar**, not a donut. The skill
+  flags a 2-slice pie as usually the wrong call for part-to-whole; a stacked
+  bar reads faster and labels more precisely for Fragrenz's 2 categories.
+  `src/components/category-breakdown-chart.tsx`.
+- **Low stock panel** — variants at/below `reorderLevel`, **or simply at zero
+  stock even with no reorder level configured** (fixed bug: Fragrenz's Excel
+  import never populated `reorderLevel` on any variant, so the original
+  `reorderLevel: { not: null }` filter silently hid every out-of-stock item).
+  Status-red count badge (icon+label, not color-alone per the skill's
+  status-color rule). `src/components/low-stock-panel.tsx`.
+- **Avg order value** — new 4th stat tile.
+
+**Currency picker on business creation** (fixed gap: currency was previously
+only ever set by seed scripts, no UI existed — a signed-up business silently
+fell back to PHP regardless of the owner's actual currency). Both `signup`
+and `createBusiness` (`/businesses/new`) now include a currency dropdown
+(PHP/USD/EUR/GBP), writing the `Setting` row at creation time. This is a
+**display label only** — no forex/conversion, every stored number is a plain
+integer in whatever currency the business operates in. Changing currency
+after creation still requires Prisma Studio (no Settings page yet — scoped
+out for this pass, along with the reinvestment goal which has the same gap).
+
+Data layer: `src/lib/dashboard-data.ts` (`getSalesTrend`, `getTopProducts`,
+`getCategoryBreakdown`, `getLowStockVariants`, `getAverageOrderValue`) — all
+businessId-scoped, verified to sum consistently against raw `sale_item` totals
+for both Fragrenz and the demo business.
+
+**Categorical chart palette** — 5 hues, added to `globals.css` as
+`--chart-1`..`--chart-5` (+ `--chart-grid`/`--chart-axis`), validated with the
+dataviz skill's `validate_palette.js` against this app's own surfaces
+(`#ffffff` light / `#1c1b22` dark), adjacent-pairs mode (correct for bar/stack
+charts where marks sit in a fixed sequence, not scatter/map's all-pairs case):
+light passes with one CVD WARN (6–8 floor band, mitigated by the mandatory
+direct labels already used); dark passes clean. Fixed order, never cycled;
+past 5 series, fold into "Other" rather than generating a 6th hue.

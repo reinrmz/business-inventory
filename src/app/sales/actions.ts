@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessContext } from "@/lib/auth";
 
 type SaleLine = { variantId: number; qty: number };
 
@@ -10,6 +11,8 @@ type SaleLine = { variantId: number; qty: number };
 // Oversell is blocked (CLAUDE.md section 6 decision) - the whole sale is
 // rejected if any line requests more than what's on hand.
 export async function recordSale(lines: SaleLine[], customer: string | null, note: string | null) {
+  const { businessId } = await requireBusinessContext();
+
   const validLines = lines.filter((l) => l.variantId && l.qty > 0);
   if (validLines.length === 0) {
     throw new Error("Add at least one item to the sale.");
@@ -17,7 +20,10 @@ export async function recordSale(lines: SaleLine[], customer: string | null, not
 
   await prisma.$transaction(async (tx) => {
     const variantIds = validLines.map((l) => l.variantId);
-    const variants = await tx.variant.findMany({ where: { id: { in: variantIds } } });
+    // Scoping by businessId here also doubles as the ownership check: any
+    // variantId that belongs to a different business simply won't be in
+    // this map, and the loop below rejects it as "not found".
+    const variants = await tx.variant.findMany({ where: { id: { in: variantIds }, businessId } });
     const variantById = new Map(variants.map((v) => [v.id, v]));
 
     for (const line of validLines) {
@@ -38,6 +44,7 @@ export async function recordSale(lines: SaleLine[], customer: string | null, not
       const lineTotal = variant.price * line.qty;
       totalAmount += lineTotal;
       return {
+        businessId,
         variantId: variant.id,
         qty: line.qty,
         unitPrice: variant.price,
@@ -48,6 +55,7 @@ export async function recordSale(lines: SaleLine[], customer: string | null, not
 
     const sale = await tx.sale.create({
       data: {
+        businessId,
         customer: customer || null,
         note: note || null,
         totalAmount,

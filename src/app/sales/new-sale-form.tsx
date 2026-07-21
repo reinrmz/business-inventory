@@ -13,7 +13,13 @@ type VariantOption = {
 
 type Line = { variantId: number; qty: number };
 
-export function NewSaleForm({ variants }: { variants: VariantOption[] }) {
+export function NewSaleForm({
+  variants,
+  currencySymbol,
+}: {
+  variants: VariantOption[];
+  currencySymbol: string;
+}) {
   const [lines, setLines] = useState<Line[]>([{ variantId: 0, qty: 1 }]);
   const [customer, setCustomer] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -54,11 +60,11 @@ export function NewSaleForm({ variants }: { variants: VariantOption[] }) {
   }
 
   return (
-    <section className="space-y-3 rounded border bg-white p-4">
-      <h2 className="font-medium">New sale</h2>
+    <section className="label-card space-y-4 p-5">
+      <h2 className="font-display text-lg font-bold">New sale</h2>
 
       {error && (
-        <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>
       )}
 
       <div className="space-y-2">
@@ -70,12 +76,12 @@ export function NewSaleForm({ variants }: { variants: VariantOption[] }) {
               <select
                 value={line.variantId}
                 onChange={(e) => updateLine(i, { variantId: Number(e.target.value) })}
-                className="min-w-[16rem] flex-1 rounded border px-2 py-1 text-sm"
+                className="min-w-[16rem] flex-1 rounded-lg border border-border bg-bg px-3 py-2 text-sm outline-none transition-standard focus:border-accent"
               >
                 <option value={0}>Select item…</option>
                 {variants.map((v) => (
                   <option key={v.id} value={v.id} disabled={v.stockQty <= 0}>
-                    {v.label} — ₱{v.price} ({v.stockQty} in stock)
+                    {v.label} — {currencySymbol}{v.price} ({v.stockQty} in stock)
                   </option>
                 ))}
               </select>
@@ -84,17 +90,17 @@ export function NewSaleForm({ variants }: { variants: VariantOption[] }) {
                 min={1}
                 value={line.qty}
                 onChange={(e) => updateLine(i, { qty: Number(e.target.value) })}
-                className={`w-20 rounded border px-2 py-1 text-sm ${overStock ? "border-red-500" : ""}`}
+                className={`tnum w-20 rounded-lg border bg-bg px-3 py-2 text-sm outline-none transition-standard focus:border-accent ${
+                  overStock ? "border-danger" : "border-border"
+                }`}
               />
               {overStock && (
-                <span className="text-xs text-red-600">
-                  only {selected!.stockQty} available
-                </span>
+                <span className="text-xs text-danger">only {selected!.stockQty} available</span>
               )}
               <button
                 type="button"
                 onClick={() => removeLine(i)}
-                className="text-xs text-gray-500 underline"
+                className="text-xs text-ink-muted underline decoration-border underline-offset-2"
               >
                 Remove
               </button>
@@ -106,24 +112,24 @@ export function NewSaleForm({ variants }: { variants: VariantOption[] }) {
       <button
         type="button"
         onClick={addLine}
-        className="text-sm text-gray-600 underline hover:text-gray-900"
+        className="text-sm font-medium text-accent transition-standard hover:opacity-80"
       >
         + Add item
       </button>
 
-      <div className="flex flex-wrap items-center gap-3 border-t pt-3">
+      <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
         <input
           value={customer}
           onChange={(e) => setCustomer(e.target.value)}
           placeholder="Customer (optional)"
-          className="rounded border px-2 py-1 text-sm"
+          className="rounded-lg border border-border bg-bg px-3 py-2 text-sm outline-none transition-standard focus:border-accent"
         />
-        <span className="text-sm font-medium">Total: ₱{total.toLocaleString()}</span>
+        <span className="tnum text-sm font-medium">Total: {currencySymbol}{total.toLocaleString()}</span>
         <button
           type="button"
           disabled={isPending}
           onClick={submit}
-          className="ml-auto rounded bg-gray-900 px-4 py-2 text-sm text-white disabled:opacity-50"
+          className="ml-auto rounded-lg bg-accent px-5 py-2 text-sm font-medium text-accent-ink transition-standard hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? "Saving…" : "Record sale"}
         </button>

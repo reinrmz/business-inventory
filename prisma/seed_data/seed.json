@@ -197,6 +197,12 @@
           "concentration": null,
           "stockQty": 1,
           "price": 80
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 500
         }
       ]
     },
@@ -227,6 +233,18 @@
           "concentration": null,
           "stockQty": 1,
           "price": 80
+        },
+        {
+          "size": "100 ML (type A)",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 500
+        },
+        {
+          "size": "Scraps",
+          "concentration": null,
+          "stockQty": 0,
+          "price": 200
         }
       ]
     },
@@ -592,25 +610,25 @@
           "size": "50 ML",
           "concentration": 20,
           "stockQty": 1,
-          "price": null
+          "price": 220
         },
         {
           "size": "50 ML",
           "concentration": 25,
           "stockQty": 0,
-          "price": null
+          "price": 270
         },
         {
           "size": "50 ML",
           "concentration": 30,
           "stockQty": 2,
-          "price": null
+          "price": 300
         },
         {
           "size": "50 ML",
           "concentration": 35,
           "stockQty": 1,
-          "price": null
+          "price": 350
         },
         {
           "size": "10 ML",
@@ -622,19 +640,19 @@
           "size": "10 ML",
           "concentration": 25,
           "stockQty": 1,
-          "price": null
+          "price": 100
         },
         {
           "size": "10 ML",
           "concentration": 30,
           "stockQty": 1,
-          "price": null
+          "price": 135
         },
         {
           "size": "10 ML",
           "concentration": 35,
           "stockQty": 0,
-          "price": null
+          "price": 175
         }
       ]
     },
@@ -646,25 +664,25 @@
           "size": "50 ML",
           "concentration": 20,
           "stockQty": 1,
-          "price": null
+          "price": 220
         },
         {
           "size": "50 ML",
           "concentration": 25,
           "stockQty": 5,
-          "price": null
+          "price": 270
         },
         {
           "size": "50 ML",
           "concentration": 30,
           "stockQty": 2,
-          "price": null
+          "price": 300
         },
         {
           "size": "50 ML",
           "concentration": 35,
           "stockQty": 1,
-          "price": null
+          "price": 350
         },
         {
           "size": "10 ML",
@@ -676,19 +694,19 @@
           "size": "10 ML",
           "concentration": 25,
           "stockQty": 1,
-          "price": null
+          "price": 100
         },
         {
           "size": "10 ML",
           "concentration": 30,
           "stockQty": 1,
-          "price": null
+          "price": 135
         },
         {
           "size": "10 ML",
           "concentration": 35,
           "stockQty": 0,
-          "price": null
+          "price": 175
         }
       ]
     },
@@ -700,25 +718,25 @@
           "size": "50 ML",
           "concentration": 20,
           "stockQty": 1,
-          "price": null
+          "price": 220
         },
         {
           "size": "50 ML",
           "concentration": 25,
           "stockQty": 1,
-          "price": null
+          "price": 270
         },
         {
           "size": "50 ML",
           "concentration": 30,
           "stockQty": 2,
-          "price": null
+          "price": 300
         },
         {
           "size": "50 ML",
           "concentration": 35,
           "stockQty": 1,
-          "price": null
+          "price": 350
         },
         {
           "size": "10 ML",
@@ -730,19 +748,19 @@
           "size": "10 ML",
           "concentration": 25,
           "stockQty": 1,
-          "price": null
+          "price": 100
         },
         {
           "size": "10 ML",
           "concentration": 30,
           "stockQty": 1,
-          "price": null
+          "price": 135
         },
         {
           "size": "10 ML",
           "concentration": 35,
           "stockQty": 0,
-          "price": null
+          "price": 175
         }
       ]
     },
@@ -754,25 +772,25 @@
           "size": "50 ML",
           "concentration": 20,
           "stockQty": 1,
-          "price": null
+          "price": 220
         },
         {
           "size": "50 ML",
           "concentration": 25,
           "stockQty": 0,
-          "price": null
+          "price": 270
         },
         {
           "size": "50 ML",
           "concentration": 30,
           "stockQty": 2,
-          "price": null
+          "price": 300
         },
         {
           "size": "50 ML",
           "concentration": 35,
           "stockQty": 1,
-          "price": null
+          "price": 350
         },
         {
           "size": "10 ML",
@@ -784,19 +802,19 @@
           "size": "10 ML",
           "concentration": 25,
           "stockQty": 1,
-          "price": null
+          "price": 100
         },
         {
           "size": "10 ML",
           "concentration": 30,
           "stockQty": 1,
-          "price": null
+          "price": 135
         },
         {
           "size": "10 ML",
           "concentration": 35,
           "stockQty": 0,
-          "price": null
+          "price": 175
         }
       ]
     },
@@ -808,25 +826,25 @@
           "size": "50 ML",
           "concentration": 20,
           "stockQty": 1,
-          "price": null
+          "price": 220
         },
         {
           "size": "50 ML",
           "concentration": 25,
           "stockQty": 1,
-          "price": null
+          "price": 270
         },
         {
           "size": "50 ML",
           "concentration": 30,
           "stockQty": 2,
-          "price": null
+          "price": 300
         },
         {
           "size": "50 ML",
           "concentration": 35,
           "stockQty": 1,
-          "price": null
+          "price": 350
         },
         {
           "size": "10 ML",
@@ -838,21 +856,95 @@
           "size": "10 ML",
           "concentration": 25,
           "stockQty": 0,
-          "price": null
+          "price": 100
         },
         {
           "size": "10 ML",
           "concentration": 30,
           "stockQty": 1,
-          "price": null
+          "price": 135
         },
         {
           "size": "10 ML",
           "concentration": 35,
           "stockQty": 0,
-          "price": null
+          "price": 175
         }
       ]
+    }
+  ],
+  "openingSale": [
+    {
+      "productName": "ECLAT for men",
+      "category": "Main Decants",
+      "size": "50 ML",
+      "concentration": null,
+      "qty": 1,
+      "unitPrice": 300
+    },
+    {
+      "productName": "Bulgari",
+      "category": "Main Decants",
+      "size": "100 ML (type A)",
+      "concentration": null,
+      "qty": 1,
+      "unitPrice": 500
+    },
+    {
+      "productName": "Aventus",
+      "category": "Main Decants",
+      "size": "50 ML",
+      "concentration": null,
+      "qty": 3,
+      "unitPrice": 300
+    },
+    {
+      "productName": "Aventus",
+      "category": "Main Decants",
+      "size": "100 ML (type A)",
+      "concentration": null,
+      "qty": 1,
+      "unitPrice": 500
+    },
+    {
+      "productName": "Aventus",
+      "category": "Main Decants",
+      "size": "Scraps",
+      "concentration": null,
+      "qty": 1,
+      "unitPrice": 200
+    },
+    {
+      "productName": "Valaya",
+      "category": "Main Decants",
+      "size": "50 ML",
+      "concentration": null,
+      "qty": 1,
+      "unitPrice": 300
+    },
+    {
+      "productName": "Good Girl",
+      "category": "Main Decants",
+      "size": "50 ML",
+      "concentration": null,
+      "qty": 1,
+      "unitPrice": 300
+    },
+    {
+      "productName": "Dior",
+      "category": "Main Decants",
+      "size": "50 ML",
+      "concentration": null,
+      "qty": 1,
+      "unitPrice": 300
+    },
+    {
+      "productName": "SWYI",
+      "category": "Oil Concentration",
+      "size": "50 ML",
+      "concentration": 25,
+      "qty": 1,
+      "unitPrice": 270
     }
   ]
 }

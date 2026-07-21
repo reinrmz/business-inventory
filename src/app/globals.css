@@ -1,26 +1,143 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #faf9f8;
+  --surface: #ffffff;
+  --ink: #1a1720;
+  --ink-muted: #6b6673;
+  --border: #e8e5ea;
+  --accent: #7c3aed;
+  --accent-ink: #ffffff;
+  --accent-soft: #f2ebfd;
+  --gold: #b5791f;
+  --gold-soft: #faf1e0;
+  --danger: #dc2626;
+  --danger-soft: #fdecec;
+  --success: #16794f;
+
+  /* Categorical chart palette — validated with dataviz skill's checker
+     (adjacent-pairs, light surface #ffffff). Fixed order, never cycled. */
+  --chart-1: #7c3aed;
+  --chart-2: #b5791f;
+  --chart-3: #1b8f7a;
+  --chart-4: #d6604d;
+  --chart-5: #2a6fb0;
+  --chart-grid: #e1e0d9;
+  --chart-axis: #c3c2b7;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root[data-theme="dark"] {
+  --bg: #121116;
+  --surface: #1c1b22;
+  --ink: #f2f0f5;
+  --ink-muted: #948fa0;
+  --border: #2c2a33;
+  --accent: #a78bfa;
+  --accent-ink: #1a1720;
+  --accent-soft: #2a2140;
+  --gold: #e0a94e;
+  --gold-soft: #2e2717;
+  --danger: #f87171;
+  --danger-soft: #331c1c;
+  --success: #4ade80;
+
+  --chart-1: #9370f0;
+  --chart-2: #b5791f;
+  --chart-3: #1f9c85;
+  --chart-4: #d16f4f;
+  --chart-5: #3f7fc0;
+  --chart-grid: #2c2c2a;
+  --chart-axis: #383835;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: #121116;
+    --surface: #1c1b22;
+    --ink: #f2f0f5;
+    --ink-muted: #948fa0;
+    --border: #2c2a33;
+    --accent: #a78bfa;
+    --accent-ink: #1a1720;
+    --accent-soft: #2a2140;
+    --gold: #e0a94e;
+    --gold-soft: #2e2717;
+    --danger: #f87171;
+    --danger-soft: #331c1c;
+    --success: #4ade80;
+
+    --chart-1: #9370f0;
+    --chart-2: #b5791f;
+    --chart-3: #1f9c85;
+    --chart-4: #d16f4f;
+    --chart-5: #3f7fc0;
+    --chart-grid: #2c2c2a;
+    --chart-axis: #383835;
   }
 }
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+}
+
+* {
+  border-color: var(--border);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-feature-settings: "tnum" 1;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.label-card {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.label-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+.label-card--gold::before {
+  background: var(--gold);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .transition-standard {
+    transition: all 150ms ease;
+  }
 }

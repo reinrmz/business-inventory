@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { Header } from "./header";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser, getCurrentBusinessId } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,17 +15,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Inventory & Sales",
-  description: "Small business inventory and sales tracker",
-};
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["500", "700"],
+});
 
-const NAV_LINKS = [
-  { href: "/", label: "Dashboard" },
-  { href: "/products", label: "Products" },
-  { href: "/inventory", label: "Inventory" },
-  { href: "/sales", label: "Sales" },
-];
+export async function generateMetadata(): Promise<Metadata> {
+  const { user } = await getCurrentUser();
+  let businessName: string | null = null;
+
+  if (user) {
+    const current = await getCurrentBusinessId(user.id);
+    if (current.businessId) {
+      const business = await prisma.business.findUnique({ where: { id: current.businessId } });
+      businessName = business?.name ?? null;
+    }
+  }
+
+  return {
+    title: businessName ? `${businessName} — Inventory & Sales` : "Vessel — Inventory & Sales",
+    description: "Small business inventory and sales tracker",
+  };
+}
+
+const THEME_INIT_SCRIPT = `
+(function () {
+  try {
+    var stored = localStorage.getItem('theme');
+    var theme = stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {}
+})();
+`;
 
 export default function RootLayout({
   children,
@@ -33,28 +57,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
-        <header className="border-b bg-white">
-          <nav className="mx-auto max-w-5xl flex items-center gap-6 px-4 py-3">
-            <span className="font-semibold">Inventory &amp; Sales</span>
-            <div className="flex gap-4 text-sm">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-        </header>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
-          {children}
-        </main>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="flex min-h-full flex-col bg-bg text-ink">
+        <Header />
+        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">{children}</main>
       </body>
     </html>
   );

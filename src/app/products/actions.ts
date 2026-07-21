@@ -2,8 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessContext } from "@/lib/auth";
 
 export async function createProduct(formData: FormData) {
+  const { businessId } = await requireBusinessContext();
+
   const name = String(formData.get("name") ?? "").trim();
   const categoryId = Number(formData.get("categoryId"));
   const notes = String(formData.get("notes") ?? "").trim() || null;
@@ -13,13 +16,15 @@ export async function createProduct(formData: FormData) {
   }
 
   await prisma.product.create({
-    data: { name, categoryId, notes },
+    data: { businessId, name, categoryId, notes },
   });
 
   revalidatePath("/products");
 }
 
 export async function updateProduct(formData: FormData) {
+  const { businessId } = await requireBusinessContext();
+
   const id = Number(formData.get("id"));
   const name = String(formData.get("name") ?? "").trim();
   const categoryId = Number(formData.get("categoryId"));
@@ -27,6 +32,11 @@ export async function updateProduct(formData: FormData) {
 
   if (!id || !name || !categoryId) {
     throw new Error("Name and category are required.");
+  }
+
+  const existing = await prisma.product.findFirst({ where: { id, businessId } });
+  if (!existing) {
+    throw new Error("Product not found.");
   }
 
   await prisma.product.update({
@@ -39,8 +49,15 @@ export async function updateProduct(formData: FormData) {
 
 // Soft-delete: keeps historical sale links intact (CLAUDE.md section 2/4).
 export async function setProductActive(formData: FormData) {
+  const { businessId } = await requireBusinessContext();
+
   const id = Number(formData.get("id"));
   const active = formData.get("active") === "true";
+
+  const existing = await prisma.product.findFirst({ where: { id, businessId } });
+  if (!existing) {
+    throw new Error("Product not found.");
+  }
 
   await prisma.product.update({
     where: { id },
@@ -51,12 +68,14 @@ export async function setProductActive(formData: FormData) {
 }
 
 export async function createCategory(formData: FormData) {
+  const { businessId } = await requireBusinessContext();
+
   const name = String(formData.get("name") ?? "").trim();
   if (!name) {
     throw new Error("Category name is required.");
   }
 
-  await prisma.category.create({ data: { name } });
+  await prisma.category.create({ data: { businessId, name } });
 
   revalidatePath("/products");
 }
