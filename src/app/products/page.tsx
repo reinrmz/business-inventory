@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { requireBusinessContext } from "@/lib/auth";
 import { createProduct, setProductActive, createCategory } from "./actions";
 import { EditProductForm } from "./edit-product-form";
+import { AddVariantForm } from "./add-variant-form";
+import { VariantRow } from "./variant-row";
 import { SearchBox } from "@/components/search-box";
 import { Pagination } from "@/components/pagination";
 
@@ -23,16 +25,27 @@ export default async function ProductsPage({
     ...(q ? { name: { contains: q } } : {}),
   };
 
-  const [categories, products, totalCount] = await Promise.all([
+  const [categories, products, totalCount, attributes] = await Promise.all([
     prisma.category.findMany({ where: { businessId, active: true }, orderBy: { name: "asc" } }),
     prisma.product.findMany({
       where,
-      include: { category: true, variants: { where: { active: true } } },
+      include: {
+        category: true,
+        variants: {
+          include: { attributes: { include: { attributeValue: true } } },
+          orderBy: { id: "asc" },
+        },
+      },
       orderBy: [{ active: "desc" }, { name: "asc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
     prisma.product.count({ where }),
+    prisma.attribute.findMany({
+      where: { businessId },
+      include: { values: { orderBy: { sortOrder: "asc" } } },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -47,22 +60,24 @@ export default async function ProductsPage({
         </p>
       </div>
 
-      {categories.length === 0 ? (
-        <section className="label-card p-5">
-          <h2 className="mb-3 font-display text-lg font-bold">Create your first category</h2>
-          <form action={createCategory} className="flex gap-2">
-            <input
-              name="name"
-              placeholder="e.g. Main Decants"
-              required
-              className="flex-1 rounded-lg border border-border bg-bg px-3 py-2 text-sm outline-none transition-standard focus:border-accent"
-            />
-            <button className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-ink transition-standard hover:opacity-90">
-              Add category
-            </button>
-          </form>
-        </section>
-      ) : (
+      <section className="label-card p-5">
+        <h2 className="mb-3 font-display text-lg font-bold">
+          {categories.length === 0 ? "Create your first category" : "Add a category"}
+        </h2>
+        <form action={createCategory} className="flex gap-2">
+          <input
+            name="name"
+            placeholder="e.g. Main Decants"
+            required
+            className="flex-1 rounded-lg border border-border bg-bg px-3 py-2 text-sm outline-none transition-standard focus:border-accent"
+          />
+          <button className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-ink transition-standard hover:opacity-90">
+            Add category
+          </button>
+        </form>
+      </section>
+
+      {categories.length > 0 && (
         <section className="label-card p-5">
           <h2 className="mb-4 font-display text-lg font-bold">Add a product</h2>
           <form action={createProduct} className="grid grid-cols-1 gap-3 sm:grid-cols-4">
@@ -116,7 +131,7 @@ export default async function ProductsPage({
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id} className="border-b border-border last:border-0">
+              <tr key={p.id} className="border-b border-border align-top last:border-0">
                 <td className="px-5 py-3">
                   <EditProductForm
                     product={{ id: p.id, name: p.name, categoryId: p.categoryId, notes: p.notes }}
@@ -124,7 +139,18 @@ export default async function ProductsPage({
                   />
                 </td>
                 <td className="px-5 py-3 text-ink-muted">{p.category.name}</td>
-                <td className="tnum px-5 py-3 text-ink-muted">{p.variants.length}</td>
+                <td className="px-5 py-3">
+                  <div className="space-y-1">
+                    {p.variants.length > 0 && (
+                      <ul className="space-y-1 text-xs text-ink-muted">
+                        {p.variants.map((v) => (
+                          <VariantRow key={v.id} variant={v} attributes={attributes} />
+                        ))}
+                      </ul>
+                    )}
+                    <AddVariantForm productId={p.id} attributes={attributes} />
+                  </div>
+                </td>
                 <td className="px-5 py-3">
                   {p.active ? (
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">

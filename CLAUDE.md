@@ -409,6 +409,21 @@ dropdown (`src/app/business-switcher-select.tsx`), navigating to
   Studio" for the rare case, given the small scale.
 - Rejection (user or business) is terminal — no re-apply flow.
 
+### Demo abuse hardening (partially done)
+Done: per-table row caps on the demo business (`src/lib/demo-limits.ts`,
+`assertUnderDemoCap`) — blocks further creates once demo hits 200 products /
+20 categories / 20 attributes / 100 attribute values / 500 variants / 500
+sales, no-ops for real businesses. Plus the existing nightly full reset via
+Vercel Cron (`vercel.json`, 3am, `CRON_SECRET`-gated).
+
+**Parked, not done**: request-level rate limiting (per-IP/session throttle
+on writes and `loginAsDemo`). Caps stop storage bloat but not spam-volume
+abuse — a script can still hammer write endpoints or the demo login with no
+throttle, costing Vercel/Turso compute even though every write past the cap
+fails. Needs a durable store (Upstash Redis free tier, since Vercel
+functions are stateless/ephemeral — can't rate-limit in-memory across
+invocations). Revisit if this becomes a real problem in practice.
+
 ---
 
 ## 10. Dashboard Analytics (built)

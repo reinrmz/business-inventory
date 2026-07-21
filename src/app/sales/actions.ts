@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireBusinessContext } from "@/lib/auth";
+import { assertUnderDemoCap } from "@/lib/demo-limits";
 
 type SaleLine = { variantId: number; qty: number };
 
@@ -17,6 +18,8 @@ export async function recordSale(lines: SaleLine[], customer: string | null, not
   if (validLines.length === 0) {
     throw new Error("Add at least one item to the sale.");
   }
+
+  await assertUnderDemoCap(businessId, "sale");
 
   await prisma.$transaction(async (tx) => {
     const variantIds = validLines.map((l) => l.variantId);
