@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // CLI engine). Remove this route once run against production.
 export async function GET(request: NextRequest) {
   const auth = request.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (auth !== `Bearer ${process.env.MIGRATION_TOKEN}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
