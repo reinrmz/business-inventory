@@ -146,7 +146,7 @@ export default async function ProductsPage({
                   />
                 </td>
                 <td className="px-5 py-3 text-ink-muted">{p.category.name}</td>
-                <td className="px-5 py-3">
+                <td className="max-w-xs px-5 py-3">
                   <div className="space-y-1">
                     {p.variants.length > 0 && (
                       <ul className="space-y-1 text-xs text-ink-muted">

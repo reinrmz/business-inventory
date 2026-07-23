@@ -34,7 +34,7 @@ export function AddVariantForm({
         setOpen(false);
         setNewValueFor({});
       }}
-      className="space-y-2 rounded-lg border border-border bg-bg p-3"
+      className="w-full space-y-2 rounded-lg border border-border bg-bg p-3"
     >
       <input type="hidden" name="productId" value={productId} />
 
