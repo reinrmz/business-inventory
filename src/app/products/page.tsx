@@ -127,7 +127,7 @@ export default async function ProductsPage({
 
       <section className="overflow-hidden rounded-xl border border-border bg-surface">
         <table className="w-full text-sm">
-          <thead className="border-b border-border bg-bg text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+          <thead className="border-b border-border bg-surface-alt text-left text-xs font-semibold uppercase tracking-wide text-accent">
             <tr>
               <th className="px-5 py-3">Name</th>
               <th className="px-5 py-3">Category</th>
@@ -138,7 +138,7 @@ export default async function ProductsPage({
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id} className="border-b border-border align-top last:border-0">
+              <tr key={p.id} className="border-b border-border align-top last:border-0 even:bg-surface-alt">
                 <td className="px-5 py-3">
                   <EditProductForm
                     product={{ id: p.id, name: p.name, categoryId: p.categoryId, notes: p.notes }}

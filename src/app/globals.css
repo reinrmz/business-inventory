@@ -3,6 +3,7 @@
 :root {
   --bg: #faf9f8;
   --surface: #ffffff;
+  --surface-alt: #efedf2;
   --ink: #1a1720;
   --ink-muted: #6b6673;
   --border: #e8e5ea;
@@ -29,6 +30,7 @@
 :root[data-theme="dark"] {
   --bg: #121116;
   --surface: #1c1b22;
+  --surface-alt: #26242d;
   --ink: #f2f0f5;
   --ink-muted: #948fa0;
   --border: #2c2a33;
@@ -54,6 +56,7 @@
   :root:not([data-theme="light"]) {
     --bg: #121116;
     --surface: #1c1b22;
+    --surface-alt: #26242d;
     --ink: #f2f0f5;
     --ink-muted: #948fa0;
     --border: #2c2a33;
@@ -79,6 +82,7 @@
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-border: var(--border);

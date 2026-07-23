@@ -80,7 +80,7 @@ export default async function SalesPage({
           <DateRangeFilter />
         </div>
         <table className="w-full text-sm">
-          <thead className="border-b border-border bg-bg text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+          <thead className="border-b border-border bg-surface-alt text-left text-xs font-semibold uppercase tracking-wide text-accent">
             <tr>
               <th className="px-5 py-3">Date</th>
               <th className="px-5 py-3">Customer</th>
@@ -90,7 +90,7 @@ export default async function SalesPage({
           </thead>
           <tbody>
             {sales.map((s) => (
-              <tr key={s.id} className="border-b border-border last:border-0">
+              <tr key={s.id} className="border-b border-border last:border-0 even:bg-surface-alt">
                 <td className="px-5 py-3 text-ink-muted">{s.soldAt.toLocaleString()}</td>
                 <td className="px-5 py-3">{s.customer ?? "—"}</td>
                 <td className="px-5 py-3 text-ink-muted">

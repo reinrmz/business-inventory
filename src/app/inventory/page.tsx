@@ -124,7 +124,7 @@ export default async function InventoryPage({
 
       <section className="overflow-hidden rounded-xl border border-border bg-surface">
         <table className="w-full text-sm">
-          <thead className="border-b border-border bg-bg text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+          <thead className="border-b border-border bg-surface-alt text-left text-xs font-semibold uppercase tracking-wide text-accent">
             <tr>
               <th className="px-5 py-3">Product</th>
               <th className="px-5 py-3">Variant</th>
@@ -135,13 +135,14 @@ export default async function InventoryPage({
             </tr>
           </thead>
           <tbody>
-            {variants.map((v) => {
+            {variants.map((v, i) => {
               const attributeLabel = v.attributes
                 .map((a) => a.attributeValue.value)
                 .join(" · ");
               return (
                 <InventoryRow
                   key={v.id}
+                  striped={i % 2 === 1}
                   currencySymbol={cur}
                   lowStockThreshold={settings.lowStockThreshold}
                   expirySoonDays={settings.expirySoonDays}

@@ -40,11 +40,13 @@ export function InventoryRow({
   currencySymbol,
   lowStockThreshold,
   expirySoonDays,
+  striped,
 }: {
   variant: Variant;
   currencySymbol: string;
   lowStockThreshold: number;
   expirySoonDays: number;
+  striped: boolean;
 }) {
   const [editingPrice, setEditingPrice] = useState(false);
   const [editingExpiry, setEditingExpiry] = useState(false);
@@ -79,7 +81,7 @@ export function InventoryRow({
 
   return (
     <>
-      <tr className="border-b border-border align-top last:border-0">
+      <tr className={`border-b border-border align-top last:border-0 ${striped ? "bg-surface-alt" : ""}`}>
         <td className="px-5 py-3 font-medium">{variant.productName}</td>
         <td className="px-5 py-3 text-ink-muted">{variant.attributeLabel}</td>
         <td className="tnum px-5 py-3">
