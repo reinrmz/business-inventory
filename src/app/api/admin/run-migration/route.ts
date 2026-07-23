@@ -7,6 +7,14 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   const auth = request.headers.get("authorization");
   if (auth !== `Bearer ${process.env.MIGRATION_TOKEN}`) {
+    const url = new URL(request.url);
+    if (url.searchParams.get("debug") === "1") {
+      return NextResponse.json({
+        error: "Unauthorized",
+        expectedTokenLength: process.env.MIGRATION_TOKEN?.length ?? null,
+        receivedAuthLength: auth?.length ?? null,
+      });
+    }
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
