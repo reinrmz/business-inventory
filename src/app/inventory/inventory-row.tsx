@@ -41,12 +41,16 @@ export function InventoryRow({
   lowStockThreshold,
   expirySoonDays,
   striped,
+  selected,
+  onToggleSelect,
 }: {
   variant: Variant;
   currencySymbol: string;
   lowStockThreshold: number;
   expirySoonDays: number;
   striped: boolean;
+  selected: boolean;
+  onToggleSelect: (id: number) => void;
 }) {
   const [editingPrice, setEditingPrice] = useState(false);
   const [editingExpiry, setEditingExpiry] = useState(false);
@@ -54,6 +58,19 @@ export function InventoryRow({
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[] | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [showBulkTip, setShowBulkTip] = useState(false);
+
+  function openExpiryEditor() {
+    setEditingExpiry(true);
+    if (typeof window !== "undefined" && !window.sessionStorage.getItem("bulkExpiryTipDismissed")) {
+      setShowBulkTip(true);
+    }
+  }
+
+  function dismissBulkTip() {
+    setShowBulkTip(false);
+    window.sessionStorage.setItem("bulkExpiryTipDismissed", "1");
+  }
 
   // Low if at/below the business low-stock threshold, or at/below this SKU's
   // own reorder level when one is set (per-SKU override still honored).
@@ -82,6 +99,15 @@ export function InventoryRow({
   return (
     <>
       <tr className={`border-b border-border align-top last:border-0 ${striped ? "bg-surface-alt" : ""}`}>
+        <td className="px-5 py-3">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onToggleSelect(variant.id)}
+            className="h-4 w-4 rounded border-border accent-accent"
+            aria-label={`Select ${variant.productName} (${variant.attributeLabel})`}
+          />
+        </td>
         <td className="px-5 py-3 font-medium">{variant.productName}</td>
         <td className="px-5 py-3 text-ink-muted">{variant.attributeLabel}</td>
         <td className="tnum px-5 py-3">
@@ -152,34 +178,50 @@ export function InventoryRow({
         </td>
         <td className="px-5 py-3">
           {editingExpiry ? (
-            <form
-              action={async (formData) => {
-                await updateExpiration(formData);
-                setEditingExpiry(false);
-              }}
-              className="flex flex-wrap items-center gap-1"
-            >
-              <input type="hidden" name="variantId" value={variant.id} />
-              <input
-                name="expiresAt"
-                type="date"
-                defaultValue={variant.expiresAt ? toDateInput(variant.expiresAt) : ""}
-                className="rounded border border-border bg-bg px-1.5 py-1 text-xs outline-none focus:border-accent"
-              />
-              <button className="rounded bg-accent px-2 py-1 text-xs font-medium text-accent-ink">
-                Save
-              </button>
-              <button
-                type="button"
-                onClick={() => setEditingExpiry(false)}
-                className="text-xs text-ink-muted"
+            <div className="space-y-1">
+              <form
+                action={async (formData) => {
+                  await updateExpiration(formData);
+                  setEditingExpiry(false);
+                }}
+                className="flex flex-wrap items-center gap-1"
               >
-                Cancel
-              </button>
-            </form>
+                <input type="hidden" name="variantId" value={variant.id} />
+                <input
+                  name="expiresAt"
+                  type="date"
+                  defaultValue={variant.expiresAt ? toDateInput(variant.expiresAt) : ""}
+                  className="rounded border border-border bg-bg px-1.5 py-1 text-xs outline-none focus:border-accent"
+                />
+                <button className="rounded bg-accent px-2 py-1 text-xs font-medium text-accent-ink">
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingExpiry(false)}
+                  className="text-xs text-ink-muted"
+                >
+                  Cancel
+                </button>
+              </form>
+              {showBulkTip && (
+                <p className="flex items-start gap-1.5 text-xs text-ink-muted">
+                  <span>
+                    Tip: select the checkboxes on the left to update expiration for multiple items at once.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={dismissBulkTip}
+                    className="shrink-0 underline decoration-border underline-offset-2 hover:text-accent"
+                  >
+                    Got it
+                  </button>
+                </p>
+              )}
+            </div>
           ) : (
             <button
-              onClick={() => setEditingExpiry(true)}
+              onClick={openExpiryEditor}
               className="transition-standard flex items-center gap-2 hover:text-accent"
             >
               {variant.expiresAt === null ? (
@@ -257,7 +299,7 @@ export function InventoryRow({
       </tr>
       {showHistory && (
         <tr className="border-b border-border bg-bg last:border-0">
-          <td colSpan={6} className="px-5 py-3">
+          <td colSpan={7} className="px-5 py-3">
             <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-muted">
               Price history — {variant.productName} ({variant.attributeLabel})
             </p>

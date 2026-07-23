@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireBusinessContext } from "@/lib/auth";
 import { getCurrencySymbol } from "@/lib/currency";
 import { getSettings } from "@/lib/settings";
-import { InventoryRow } from "./inventory-row";
+import { InventoryTable } from "./inventory-table";
 import { InventoryFilters } from "./inventory-filters";
 import { SearchBox } from "@/components/search-box";
 import { Pagination } from "@/components/pagination";
@@ -123,55 +123,28 @@ export default async function InventoryPage({
       </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-surface">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-surface-alt text-left text-xs font-semibold uppercase tracking-wide text-accent">
-            <tr>
-              <th className="px-5 py-3">Product</th>
-              <th className="px-5 py-3">Variant</th>
-              <th className="px-5 py-3">Stock</th>
-              <th className="px-5 py-3">Price / Cost</th>
-              <th className="px-5 py-3">Expiration</th>
-              <th className="px-5 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {variants.map((v, i) => {
-              const attributeLabel = v.attributes
-                .map((a) => a.attributeValue.value)
-                .join(" · ");
-              return (
-                <InventoryRow
-                  key={v.id}
-                  striped={i % 2 === 1}
-                  currencySymbol={cur}
-                  lowStockThreshold={settings.lowStockThreshold}
-                  expirySoonDays={settings.expirySoonDays}
-                  variant={{
-                    id: v.id,
-                    productName: v.product.name,
-                    attributeLabel,
-                    price: v.price,
-                    cost: v.cost,
-                    stockQty: v.stockQty,
-                    reorderLevel: v.reorderLevel,
-                    expiresAt: v.expiresAt,
-                  }}
-                />
-              );
-            })}
-            {variants.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-5 py-10 text-center text-ink-muted">
-                  {q
-                    ? `No inventory matches "${q}".`
-                    : filtersActive
-                      ? "No variants match the selected filters."
-                      : "No inventory yet."}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <InventoryTable
+          currencySymbol={cur}
+          lowStockThreshold={settings.lowStockThreshold}
+          expirySoonDays={settings.expirySoonDays}
+          emptyMessage={
+            q
+              ? `No inventory matches "${q}".`
+              : filtersActive
+                ? "No variants match the selected filters."
+                : "No inventory yet."
+          }
+          variants={variants.map((v) => ({
+            id: v.id,
+            productName: v.product.name,
+            attributeLabel: v.attributes.map((a) => a.attributeValue.value).join(" · "),
+            price: v.price,
+            cost: v.cost,
+            stockQty: v.stockQty,
+            reorderLevel: v.reorderLevel,
+            expiresAt: v.expiresAt,
+          }))}
+        />
         <Pagination
           page={page}
           pageCount={pageCount}

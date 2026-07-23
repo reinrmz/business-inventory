@@ -66,6 +66,29 @@ export async function updateExpiration(formData: FormData) {
   revalidatePath("/inventory");
 }
 
+// Bulk version of updateExpiration — same date applied to many variants in
+// one query (e.g. a shipment that all expires the same day).
+export async function bulkUpdateExpiration(variantIds: number[], expiresAtRaw: string) {
+  const { businessId } = await requireBusinessContext();
+
+  const raw = expiresAtRaw.trim();
+  const expiresAt = raw === "" ? null : new Date(`${raw}T00:00:00.000Z`);
+
+  if (variantIds.length === 0) {
+    throw new Error("No variants selected.");
+  }
+  if (expiresAt !== null && Number.isNaN(expiresAt.getTime())) {
+    throw new Error("Invalid expiration date.");
+  }
+
+  await prisma.variant.updateMany({
+    where: { id: { in: variantIds }, businessId },
+    data: { expiresAt },
+  });
+
+  revalidatePath("/inventory");
+}
+
 export async function getPriceHistory(variantId: number) {
   const { businessId } = await requireBusinessContext();
 
