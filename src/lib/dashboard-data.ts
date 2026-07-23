@@ -114,11 +114,11 @@ export type LowStockVariant = {
   reorderLevel: number | null;
 };
 
-// Flags a variant if it's at/below its configured reorder level, OR if it's
-// simply out of stock (stockQty === 0) - out-of-stock is always worth
-// surfacing even when no reorder threshold was ever set (e.g. the Excel
-// import never populated reorderLevel for any Fragrenz variant).
-export async function getLowStockVariants(businessId: number) {
+// Flags a variant if it's at/below the business low-stock threshold, at/below
+// its own configured reorder level, OR simply out of stock (stockQty === 0) -
+// out-of-stock is always worth surfacing even when no threshold was set (e.g.
+// the Excel import never populated reorderLevel for any Fragrenz variant).
+export async function getLowStockVariants(businessId: number, threshold: number) {
   const variants = await prisma.variant.findMany({
     where: { businessId, active: true },
     include: {
@@ -129,7 +129,12 @@ export async function getLowStockVariants(businessId: number) {
   });
 
   return variants
-    .filter((v) => v.stockQty === 0 || (v.reorderLevel !== null && v.stockQty <= v.reorderLevel))
+    .filter(
+      (v) =>
+        v.stockQty === 0 ||
+        v.stockQty <= threshold ||
+        (v.reorderLevel !== null && v.stockQty <= v.reorderLevel),
+    )
     .map((v) => ({
       id: v.id,
       productName: v.product.name,
@@ -137,6 +142,49 @@ export async function getLowStockVariants(businessId: number) {
       stockQty: v.stockQty,
       reorderLevel: v.reorderLevel,
     }));
+}
+
+export type ExpiringVariant = {
+  id: number;
+  productName: string;
+  attributeLabel: string;
+  stockQty: number;
+  expiresAt: Date;
+  daysUntil: number; // negative = already expired
+};
+
+// Variants whose expiration is within `withinDays` (default 7) or already
+// past. Only active variants with an expiration set and stock still on hand
+// (stockQty > 0) - an out-of-stock expired variant needs no action.
+export async function getExpiringVariants(businessId: number, withinDays = 7) {
+  const variants = await prisma.variant.findMany({
+    where: { businessId, active: true, expiresAt: { not: null }, stockQty: { gt: 0 } },
+    include: {
+      product: true,
+      attributes: { include: { attributeValue: true } },
+    },
+  });
+
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = new Date();
+  const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+
+  return variants
+    .map((v) => {
+      const e = v.expiresAt as Date;
+      const target = Date.UTC(e.getUTCFullYear(), e.getUTCMonth(), e.getUTCDate());
+      const days = Math.round((target - todayUtc) / DAY);
+      return {
+        id: v.id,
+        productName: v.product.name,
+        attributeLabel: v.attributes.map((a) => a.attributeValue.value).join(" · "),
+        stockQty: v.stockQty,
+        expiresAt: e,
+        daysUntil: days,
+      };
+    })
+    .filter((v) => v.daysUntil <= withinDays)
+    .sort((a, b) => a.daysUntil - b.daysUntil);
 }
 
 export async function getAverageOrderValue(businessId: number) {

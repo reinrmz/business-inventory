@@ -1,17 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import { requireBusinessContext } from "@/lib/auth";
 import { currencySymbolFor } from "@/lib/currency";
+import { getSettings } from "@/lib/settings";
 import {
   getSalesTrend,
   getTopProducts,
   getCategoryBreakdown,
   getLowStockVariants,
+  getExpiringVariants,
   getAverageOrderValue,
 } from "@/lib/dashboard-data";
 import { SalesTrendChart } from "@/components/sales-trend-chart";
 import { TopProductsChart } from "@/components/top-products-chart";
 import { CategoryBreakdownChart } from "@/components/category-breakdown-chart";
 import { LowStockPanel } from "@/components/low-stock-panel";
+import { ExpiringPanel } from "@/components/expiring-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -38,24 +41,25 @@ function StatCard({
 export default async function DashboardPage() {
   const { businessId } = await requireBusinessContext();
 
-  const [saleItems, variants, settings, dailyTrend, weeklyTrend, topProducts, categoryBreakdown, lowStock, avgOrderValue] =
+  const settings = await getSettings(businessId);
+
+  const [saleItems, variants, dailyTrend, weeklyTrend, topProducts, categoryBreakdown, lowStock, expiring, avgOrderValue] =
     await Promise.all([
       prisma.saleItem.findMany({ where: { businessId } }),
       prisma.variant.findMany({ where: { businessId, active: true } }),
-      prisma.setting.findMany({ where: { businessId } }),
       getSalesTrend(businessId, "daily"),
       getSalesTrend(businessId, "weekly"),
       getTopProducts(businessId),
       getCategoryBreakdown(businessId),
-      getLowStockVariants(businessId),
+      getLowStockVariants(businessId, settings.lowStockThreshold),
+      getExpiringVariants(businessId, settings.expirySoonDays),
       getAverageOrderValue(businessId),
     ]);
 
-  const settingMap = new Map(settings.map((s) => [s.key, s.value]));
-  const currency = settingMap.get("currency") ?? "PHP";
+  const currency = settings.currency;
   const cur = currencySymbolFor(currency);
-  const goalMin = Number(settingMap.get("reinvestment_goal_min") ?? 0);
-  const goalMax = Number(settingMap.get("reinvestment_goal_max") ?? 0);
+  const goalMin = settings.reinvestmentGoalMin;
+  const goalMax = settings.reinvestmentGoalMax;
 
   const revenue = saleItems.reduce((sum, i) => sum + i.lineTotal, 0);
   const profit = saleItems.reduce(
@@ -115,7 +119,10 @@ export default async function DashboardPage() {
         <CategoryBreakdownChart categories={categoryBreakdown} currencySymbol={cur} />
       </div>
 
-      <LowStockPanel variants={lowStock} />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <LowStockPanel variants={lowStock} />
+        <ExpiringPanel variants={expiring} />
+      </div>
     </div>
   );
 }

@@ -36,6 +36,36 @@ export async function updatePricing(formData: FormData) {
   revalidatePath("/inventory");
 }
 
+// Set/clear a variant's expiration date. Optional — many products never
+// expire. Empty input clears the date (stored null).
+export async function updateExpiration(formData: FormData) {
+  const { businessId } = await requireBusinessContext();
+
+  const variantId = Number(formData.get("variantId"));
+  const raw = String(formData.get("expiresAt") ?? "").trim();
+  // <input type="date"> gives "YYYY-MM-DD"; store at UTC midnight.
+  const expiresAt = raw === "" ? null : new Date(`${raw}T00:00:00.000Z`);
+
+  if (!variantId) {
+    throw new Error("Valid variant is required.");
+  }
+  if (expiresAt !== null && Number.isNaN(expiresAt.getTime())) {
+    throw new Error("Invalid expiration date.");
+  }
+
+  const variant = await prisma.variant.findFirst({ where: { id: variantId, businessId } });
+  if (!variant) {
+    throw new Error("Variant not found.");
+  }
+
+  await prisma.variant.update({
+    where: { id: variantId },
+    data: { expiresAt },
+  });
+
+  revalidatePath("/inventory");
+}
+
 export async function getPriceHistory(variantId: number) {
   const { businessId } = await requireBusinessContext();
 

@@ -85,41 +85,55 @@ export function AddVariantForm({
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-        <input
-          name="sku"
-          placeholder="SKU (optional)"
-          className="rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
-        />
-        <input
-          name="price"
-          type="number"
-          step="1"
-          placeholder="Price"
-          required
-          className="rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
-        />
-        <input
-          name="cost"
-          type="number"
-          step="1"
-          placeholder="Cost (optional)"
-          className="rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
-        />
-        <input
-          name="stockQty"
-          type="number"
-          step="1"
-          placeholder="Stock qty"
-          defaultValue={0}
-          className="rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
-        />
-        <input
-          name="reorderLevel"
-          type="number"
-          step="1"
-          placeholder="Reorder at (optional)"
-          className="rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
-        />
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-ink-muted">SKU</label>
+          <input
+            name="sku"
+            placeholder="Optional"
+            className="w-full rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-ink-muted">Price</label>
+          <input
+            name="price"
+            type="number"
+            step="1"
+            placeholder="Required"
+            required
+            className="w-full rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-ink-muted">Cost</label>
+          <input
+            name="cost"
+            type="number"
+            step="1"
+            placeholder="Optional"
+            className="w-full rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-ink-muted">Stock qty</label>
+          <input
+            name="stockQty"
+            type="number"
+            step="1"
+            defaultValue={0}
+            className="w-full rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-ink-muted">Reorder at</label>
+          <input
+            name="reorderLevel"
+            type="number"
+            step="1"
+            placeholder="Optional"
+            className="w-full rounded border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
+          />
+        </div>
       </div>
 
       <div className="flex gap-2">

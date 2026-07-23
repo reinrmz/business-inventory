@@ -4,6 +4,7 @@ import { createProduct, setProductActive, createCategory } from "./actions";
 import { EditProductForm } from "./edit-product-form";
 import { AddVariantForm } from "./add-variant-form";
 import { VariantRow } from "./variant-row";
+import { ProductsFilters } from "./products-filters";
 import { SearchBox } from "@/components/search-box";
 import { Pagination } from "@/components/pagination";
 
@@ -14,15 +15,17 @@ const PAGE_SIZE = 25;
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; category?: string }>;
 }) {
   const { businessId } = await requireBusinessContext();
-  const { q, page: pageRaw } = await searchParams;
+  const { q, page: pageRaw, category } = await searchParams;
   const page = Math.max(1, Number(pageRaw) || 1);
+  const categoryId = category ? Number(category) : null;
 
   const where = {
     businessId,
     ...(q ? { name: { contains: q } } : {}),
+    ...(categoryId ? { categoryId } : {}),
   };
 
   const [categories, products, totalCount, attributes] = await Promise.all([
@@ -48,6 +51,7 @@ export default async function ProductsPage({
     }),
   ]);
 
+  const filtersActive = Boolean(category);
   const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
@@ -111,8 +115,11 @@ export default async function ProductsPage({
         </section>
       )}
 
-      <div className="flex items-center justify-between gap-4">
-        <SearchBox placeholder="Search products…" />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <SearchBox placeholder="Search products…" />
+          <ProductsFilters categories={categories} />
+        </div>
         <p className="text-xs text-ink-muted">
           {totalCount} product{totalCount === 1 ? "" : "s"}
         </p>
@@ -178,13 +185,22 @@ export default async function ProductsPage({
             {products.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-5 py-10 text-center text-ink-muted">
-                  {q ? `No products match "${q}".` : "No products yet."}
+                  {q
+                    ? `No products match "${q}".`
+                    : filtersActive
+                      ? "No products match the selected filters."
+                      : "No products yet."}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-        <Pagination page={page} pageCount={pageCount} basePath="/products" searchParams={{ q }} />
+        <Pagination
+          page={page}
+          pageCount={pageCount}
+          basePath="/products"
+          searchParams={{ q, category }}
+        />
       </section>
     </div>
   );

@@ -1,52 +1,68 @@
 import Link from "next/link";
 
-type LowStockVariant = {
+type ExpiringVariant = {
   id: number;
   productName: string;
   attributeLabel: string;
   stockQty: number;
-  reorderLevel: number | null;
+  expiresAt: Date;
+  daysUntil: number;
 };
 
 const TIER_LIMIT = 4;
 
-export function LowStockPanel({ variants }: { variants: LowStockVariant[] }) {
-  // Split by severity: out of stock (can't sell now) vs low (running down).
-  const outOfStock = variants.filter((v) => v.stockQty === 0);
-  const low = variants.filter((v) => v.stockQty > 0);
+function dateLabel(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
+
+function expiredStatus(daysUntil: number) {
+  return `EXPIRED ${-daysUntil}d ago`;
+}
+
+function soonStatus(daysUntil: number) {
+  if (daysUntil === 0) return "EXPIRES TODAY";
+  if (daysUntil === 1) return "1 day left";
+  return `${daysUntil} days left`;
+}
+
+export function ExpiringPanel({ variants }: { variants: ExpiringVariant[] }) {
+  // Split by severity: already expired (pull from shelf) vs expiring soon
+  // (discount / move it). daysUntil === 0 counts as expiring soon, not expired.
+  const expired = variants.filter((v) => v.daysUntil < 0);
+  const soon = variants.filter((v) => v.daysUntil >= 0);
 
   return (
     <section className="label-card p-5">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-display text-lg font-bold">Stock levels</h2>
+        <h2 className="font-display text-lg font-bold">Expiry</h2>
         {variants.length > 0 && (
-          <span className="rounded-full bg-danger-soft px-2.5 py-0.5 text-xs font-semibold text-danger">
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+              expired.length > 0 ? "bg-danger-soft text-danger" : "bg-gold-soft text-gold"
+            }`}
+          >
             {variants.length}
           </span>
         )}
       </div>
 
       {variants.length === 0 ? (
-        <p className="text-sm text-ink-muted">
-          Nothing out of stock or below its reorder level. Nice.
-        </p>
+        <p className="text-sm text-ink-muted">Nothing expired or expiring within a week. Nice.</p>
       ) : (
         <div className="space-y-4">
           <Tier
-            label="Out of stock"
+            label="Expired"
             tone="danger"
-            items={outOfStock}
-            href="/inventory?stock=out"
-            renderStatus={() => "OUT OF STOCK"}
+            items={expired}
+            href="/inventory?expiry=expired"
+            renderStatus={(v) => expiredStatus(v.daysUntil)}
           />
           <Tier
-            label="Low"
+            label="Expiring soon"
             tone="warning"
-            items={low}
-            href="/inventory?stock=low"
-            renderStatus={(v) =>
-              v.reorderLevel !== null ? `${v.stockQty} / ${v.reorderLevel}` : `${v.stockQty} left`
-            }
+            items={soon}
+            href="/inventory?expiry=soon"
+            renderStatus={(v) => soonStatus(v.daysUntil)}
           />
         </div>
       )}
@@ -63,9 +79,9 @@ function Tier({
 }: {
   label: string;
   tone: "danger" | "warning";
-  items: LowStockVariant[];
+  items: ExpiringVariant[];
   href: string;
-  renderStatus: (v: LowStockVariant) => string;
+  renderStatus: (v: ExpiringVariant) => string;
 }) {
   if (items.length === 0) return null;
 
@@ -90,9 +106,10 @@ function Tier({
           <li key={v.id} className="flex items-center justify-between gap-2 text-sm">
             <div className="min-w-0">
               <p className="truncate font-medium">{v.productName}</p>
-              {v.attributeLabel && (
-                <p className="truncate text-xs text-ink-muted">{v.attributeLabel}</p>
-              )}
+              <p className="truncate text-xs text-ink-muted">
+                {v.attributeLabel ? `${v.attributeLabel} · ` : ""}
+                {dateLabel(v.expiresAt)} · {v.stockQty} in stock
+              </p>
             </div>
             <span className={`tnum shrink-0 text-xs font-semibold ${statusColor}`}>
               {renderStatus(v)}

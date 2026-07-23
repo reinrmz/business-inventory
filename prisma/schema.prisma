@@ -138,6 +138,7 @@ model Variant {
   cost         Int?
   stockQty     Int                @default(0)
   reorderLevel Int?
+  expiresAt    DateTime?
   active       Boolean            @default(true)
   attributes   VariantAttribute[]
   saleItems    SaleItem[]
