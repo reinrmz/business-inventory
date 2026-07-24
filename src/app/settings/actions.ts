@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireBusinessContext } from "@/lib/auth";
+import { requireBusinessContext, hashPassword, verifyPassword } from "@/lib/auth";
 import { SUPPORTED_CURRENCIES } from "@/lib/settings";
 
 export type SettingsResult = { error?: string; ok?: boolean };
@@ -66,5 +66,33 @@ export async function saveSettings(formData: FormData): Promise<SettingsResult> 
   revalidatePath("/settings");
   revalidatePath("/inventory");
   revalidatePath("/");
+  return { ok: true };
+}
+
+export async function changePassword(formData: FormData): Promise<SettingsResult> {
+  const { user } = await requireBusinessContext();
+
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return { error: "All fields are required." };
+  }
+  if (newPassword.length < 8) {
+    return { error: "New password must be at least 8 characters." };
+  }
+  if (newPassword !== confirmPassword) {
+    return { error: "New password and confirmation do not match." };
+  }
+
+  const valid = await verifyPassword(currentPassword, user.passwordHash);
+  if (!valid) {
+    return { error: "Current password is incorrect." };
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+
   return { ok: true };
 }

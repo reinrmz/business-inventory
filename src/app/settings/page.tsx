@@ -3,6 +3,7 @@ import { requireBusinessContext } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
 import { SettingsForm } from "./settings-form";
 import { AttributesSection } from "./attributes-section";
+import { ChangePasswordForm } from "./change-password-form";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,11 @@ export default async function SettingsPage() {
 
       <section className="label-card p-6">
         <AttributesSection attributes={attributes} />
+      </section>
+
+      <section className="label-card p-6">
+        <h2 className="mb-4 font-display text-lg font-semibold">Change password</h2>
+        <ChangePasswordForm />
       </section>
     </div>
   );
