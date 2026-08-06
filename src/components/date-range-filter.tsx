@@ -59,20 +59,41 @@ export function DateRangeFilter() {
     applyParams({ from: fromDate ? toDateInputValue(fromDate) : null, to: null });
   }
 
+  function isPresetActive(preset: (typeof PRESETS)[number]) {
+    if (to) return false;
+    const fromDate = preset.from(new Date());
+    const expectedFrom = fromDate ? toDateInputValue(fromDate) : "";
+    return from === expectedFrom;
+  }
+
+  const isCustomRange = !PRESETS.some(isPresetActive);
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex flex-wrap gap-1.5">
-        {PRESETS.map((preset) => (
-          <button
-            key={preset.label}
-            onClick={() => applyPreset(preset)}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-ink-muted transition-standard hover:border-accent hover:text-accent"
-          >
-            {preset.label}
-          </button>
-        ))}
+        {PRESETS.map((preset) => {
+          const active = isPresetActive(preset);
+          return (
+            <button
+              key={preset.label}
+              onClick={() => applyPreset(preset)}
+              aria-pressed={active}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-standard ${
+                active
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-border text-ink-muted hover:border-accent hover:text-accent"
+              }`}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
       </div>
-      <div className="flex items-center gap-2">
+      <div
+        className={`flex items-center gap-2 rounded-lg px-1.5 py-0.5 ${
+          isCustomRange && (from || to) ? "ring-1 ring-accent" : ""
+        }`}
+      >
         <input
           type="date"
           value={from}

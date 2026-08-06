@@ -80,3 +80,17 @@ export async function recordSale(lines: SaleLine[], customer: string | null, not
   revalidatePath("/inventory");
   revalidatePath("/");
 }
+
+export async function updateSaleCustomer(saleId: number, customer: string | null) {
+  const { businessId } = await requireBusinessContext();
+
+  const { count } = await prisma.sale.updateMany({
+    where: { id: saleId, businessId },
+    data: { customer: customer || null },
+  });
+  if (count === 0) {
+    throw new Error("Sale not found.");
+  }
+
+  revalidatePath("/sales");
+}

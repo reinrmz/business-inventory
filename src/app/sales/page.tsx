@@ -4,6 +4,8 @@ import { getCurrencySymbol } from "@/lib/currency";
 import { NewSaleForm } from "./new-sale-form";
 import { DateRangeFilter } from "@/components/date-range-filter";
 import { Pagination } from "@/components/pagination";
+import { CustomerCell } from "./customer-cell";
+import { ExportButton } from "./export-button";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +79,10 @@ export default async function SalesPage({
           <h2 className="font-display text-lg font-bold">
             Sales <span className="text-ink-muted font-normal">({totalCount})</span>
           </h2>
-          <DateRangeFilter />
+          <div className="flex items-center gap-2">
+            <DateRangeFilter />
+            <ExportButton />
+          </div>
         </div>
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-surface-alt text-left text-xs font-semibold uppercase tracking-wide text-accent">
@@ -92,7 +97,9 @@ export default async function SalesPage({
             {sales.map((s) => (
               <tr key={s.id} className="border-b border-border last:border-0 even:bg-surface-alt">
                 <td className="px-5 py-3 text-ink-muted">{s.soldAt.toLocaleString()}</td>
-                <td className="px-5 py-3">{s.customer ?? "—"}</td>
+                <td className="px-5 py-3">
+                  <CustomerCell saleId={s.id} customer={s.customer} />
+                </td>
                 <td className="px-5 py-3 text-ink-muted">
                   {s.items.map((i) => `${i.qty}× ${i.variant.product.name}`).join(", ")}
                 </td>
